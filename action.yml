@@ -1,0 +1,63 @@
+name: "Credly Badge README Updater"
+description: "Auto-sync your Credly certifications and badges to your GitHub profile README"
+author: "Sagargupta16"
+
+branding:
+  icon: "award"
+  color: "orange"
+
+inputs:
+  credly-username:
+    description: "Your Credly username (from your Credly profile URL)"
+    required: true
+  readme-path:
+    description: "Path to your README file"
+    required: false
+    default: "README.md"
+  badge-size:
+    description: "Badge image size in pixels"
+    required: false
+    default: "100"
+  max-retries:
+    description: "Max retry attempts for Credly API calls"
+    required: false
+    default: "3"
+  cert-keywords:
+    description: "Comma-separated keywords to identify industry certifications (matched against badge name)"
+    required: false
+    default: "Certified"
+  professional-keywords:
+    description: "Comma-separated keywords to identify professional/partner badges"
+    required: false
+    default: "Partner: Technical,Generative AI Technical Intermediate,AI Foundational,Well-Architected Proficient"
+
+outputs:
+  total-badges:
+    description: "Total number of badges found"
+  certifications-count:
+    description: "Number of industry certifications"
+  professional-count:
+    description: "Number of professional/partner badges"
+  knowledge-count:
+    description: "Number of knowledge/learning badges"
+  changed:
+    description: "Whether the README was updated (true/false)"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Run Credly badge updater
+      shell: bash
+      env:
+        CREDLY_USERNAME: ${{ inputs.credly-username }}
+        README_PATH: ${{ inputs.readme-path }}
+        BADGE_SIZE: ${{ inputs.badge-size }}
+        MAX_RETRIES: ${{ inputs.max-retries }}
+        CERT_KEYWORDS: ${{ inputs.cert-keywords }}
+        PROFESSIONAL_KEYWORDS: ${{ inputs.professional-keywords }}
+      run: python "${{ github.action_path }}/update-credly-badges.py"
